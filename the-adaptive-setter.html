@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ListingFlow AI | Real Estate Prospecting & Setter Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0f17;
+            color: #f3f4f6;
+        }
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(31, 41, 55, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .pulse-glow {
+            animation: pulseGlow 2s infinite alternate;
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
+            100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#0b0f17] text-gray-100 antialiased selection:bg-blue-600 selection:text-white">
+
+    <!-- Navigation Header -->
+    <header class="border-b border-gray-800 bg-[#0d131f]/90 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl shadow-lg shadow-blue-500/20">
+                    <i data-lucide="phone-call" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-wide bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+                        ListingFlow AI
+                    </h1>
+                    <p class="text-xs text-blue-400 font-medium">Real Estate Appointment Setter & Multi-Agent Simulator</p>
+                </div>
+            </div>
+
+            <!-- Global Controls & Status -->
+            <div class="flex items-center space-x-3">
+                <div id="simStatusBadge" class="flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2"></span>
+                    <span>Ready</span>
+                </div>
+                
+                <button id="btnToggleSim" class="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition shadow-lg shadow-blue-600/25 active:scale-95">
+                    <i data-lucide="play" class="w-4 h-4 fill-current" id="playIcon"></i>
+                    <span id="playText">Start Live Simulation</span>
+                </button>
+                
+                <button id="btnStepSim" class="flex items-center space-x-1 bg-gray-800 hover:bg-gray-700 text-gray-200 text-sm font-medium px-3 py-2 rounded-xl border border-gray-700 transition">
+                    <i data-lucide="skip-forward" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Single Call</span>
+                </button>
+
+                <button id="btnResetSim" class="p-2 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white rounded-xl border border-gray-700 transition" title="Reset All Data">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT COLUMN: Trait Controls & Agent Architecture (4 Cols) -->
+        <div class="lg:col-span-4 space-y-6">
+            
+            <!-- Setter Personality & Trait Sliders -->
+            <div class="glass-panel rounded-2xl p-5 border border-gray-800 shadow-xl">
+                <div class="flex items-center justify-between mb-4 border-b border-gray-800/80 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="sliders" class="w-5 h-5 text-blue-400"></i>
+                        <h2 class="font-bold text-base text-gray-100">Setter Personality & Attributes</h2>
+                    </div>
+                    <span class="text-xs bg-blue-500/10 text-blue-400 font-mono px-2 py-0.5 rounded border border-blue-500/20">EQ Profile</span>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Resilience -->
+                    <div>
+                        <div class="flex justify-between text-xs font-medium mb-1">
+                            <span class="text-gray-300 flex items-center gap-1">
+                                <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-red-400"></i> Rejection Resilience
+                            </span>
+                            <span id="valResilience" class="font-mono text-blue-400">85%</span>
+                        </div>
+                        <input type="range" id="inputResilience" min="10" max="100" value="85" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                        <p class="text-[11px] text-gray-500 mt-0.5">Ability to recover tone immediately after harsh hang-ups.</p>
+                    </div>
+
+                    <!-- Conversational Agility -->
+                    <div>
+                        <div class="flex justify-between text-xs font-medium mb-1">
+                            <span class="text-gray-300 flex items-center gap-1">
+                                <i data-lucide="zap" class="w-3.5 h-3.5 text-yellow-400"></i> Conversational Agility
+                            </span>
+                            <span id="valAgility" class="font-mono text-blue-400">80%</span>
+                        </div>
+                        <input type="range" id="inputAgility" min="10" max="100" value="80" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                        <p class="text-[11px] text-gray-500 mt-0.5">Pivoting away from rigid scripts based on subtle seller cues.</p>
+                    </div>
+
+                    <!-- Assertive Empathy -->
+                    <div>
+                        <div class="flex justify-between text-xs font-medium mb-1">
+                            <span class="text-gray-300 flex items-center gap-1">
+                                <i data-lucide="heart-handshake" class="w-3.5 h-3.5 text-emerald-400"></i> Assertive Empathy
+                            </span>
+                            <span id="valEmpathy" class="font-mono text-blue-400">75%</span>
+                        </div>
+                        <input type="range" id="inputEmpathy" min="10" max="100" value="75" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                        <p class="text-[11px] text-gray-500 mt-0.5">Validating seller hesitation while pushing for the listing appointment.</p>
+                    </div>
+
+                    <!-- Internal Locus of Control -->
+                    <div>
+                        <div class="flex justify-between text-xs font-medium mb-1">
+                            <span class="text-gray-300 flex items-center gap-1">
+                                <i data-lucide="target" class="w-3.5 h-3.5 text-purple-400"></i> Internal Locus of Control
+                            </span>
+                            <span id="valLocus" class="font-mono text-blue-400">90%</span>
+                        </div>
+                        <input type="range" id="inputLocus" min="10" max="100" value="90" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                        <p class="text-[11px] text-gray-500 mt-0.5">Focuses on execution quality rather than blaming lead list quality.</p>
+                    </div>
+
+                    <!-- CRM Hygiene / Discipline -->
+                    <div>
+                        <div class="flex justify-between text-xs font-medium mb-1">
+                            <span class="text-gray-300 flex items-center gap-1">
+                                <i data-lucide="file-check-2" class="w-3.5 h-3.5 text-cyan-400"></i> CRM Hygiene & Detail
+                            </span>
+                            <span id="valHygiene" class="font-mono text-blue-400">95%</span>
+                        </div>
+                        <input type="range" id="inputHygiene" min="10" max="100" value="95" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                        <p class="text-[11px] text-gray-500 mt-0.5">Precision of seller notes, timeline tracking, and listing handoff quality.</p>
+                    </div>
+                </div>
+
+                <!-- Strategy Fine-Tuning Controls -->
+                <div class="mt-6 pt-4 border-t border-gray-800/80 space-y-3">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Operational Parameters</h3>
+                    
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-300">Script Rigidity vs. Agility</span>
+                            <span id="valScriptMode" class="text-gray-400 font-mono">Dynamic Pivot</span>
+                        </div>
+                        <input type="range" id="inputScriptRigidity" min="0" max="100" value="30" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                        <div class="flex justify-between text-[10px] text-gray-500 mt-1">
+                            <span>Strict Scripting</span>
+                            <span>Freeform Agility</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-300">AI Learning Rate (Memory Weight)</span>
+                            <span id="valLearningRate" class="text-gray-400 font-mono">0.15</span>
+                        </div>
+                        <input type="range" id="inputLearningRate" min="1" max="50" value="15" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5 AI/Agent Architecture Units Overview -->
+            <div class="glass-panel rounded-2xl p-5 border border-gray-800 shadow-xl space-y-3">
+                <div class="flex items-center justify-between border-b border-gray-800/80 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="cpu" class="w-5 h-5 text-indigo-400"></i>
+                        <h2 class="font-bold text-base text-gray-100">Multi-Agent System Status</h2>
+                    </div>
+                    <span class="text-[10px] bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded font-mono border border-indigo-500/20">5 Units Active</span>
+                </div>
+
+                <div class="space-y-2" id="agentUnitsContainer">
+                    <!-- Agent 1 -->
+                    <div id="agent-1" class="glass-card p-3 rounded-xl border-l-4 border-l-blue-500 transition-all duration-300">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-semibold text-blue-300 flex items-center gap-1.5">
+                                <i data-lucide="route" class="w-3.5 h-3.5"></i> 1. Campaign & Lead Allocator
+                            </span>
+                            <span class="agent-status text-[10px] font-mono text-gray-400">Idle</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-1">Routes high-priority leads (Expired, FSBO, Absentee) to setters.</p>
+                    </div>
+
+                    <!-- Agent 2 -->
+                    <div id="agent-2" class="glass-card p-3 rounded-xl border-l-4 border-l-amber-500 transition-all duration-300">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-semibold text-amber-300 flex items-center gap-1.5">
+                                <i data-lucide="brain" class="w-3.5 h-3.5"></i> 2. Homeowner Intent Engine
+                            </span>
+                            <span class="agent-status text-[10px] font-mono text-gray-400">Idle</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-1">Detects signals: downsizing, price drop history, relocations.</p>
+                    </div>
+
+                    <!-- Agent 3 -->
+                    <div id="agent-3" class="glass-card p-3 rounded-xl border-l-4 border-l-purple-500 transition-all duration-300">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-semibold text-purple-300 flex items-center gap-1.5">
+                                <i data-lucide="message-square-code" class="w-3.5 h-3.5"></i> 3. Reasoning & Objection Core
+                            </span>
+                            <span class="agent-status text-[10px] font-mono text-gray-400">Idle</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-1">Formulates real-time pivots, value propositions, and empathy phrasing.</p>
+                    </div>
+
+                    <!-- Agent 4 -->
+                    <div id="agent-4" class="glass-card p-3 rounded-xl border-l-4 border-l-emerald-500 transition-all duration-300">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-semibold text-emerald-300 flex items-center gap-1.5">
+                                <i data-lucide="phone-outgoing" class="w-3.5 h-3.5"></i> 4. Multi-channel Execution Unit
+                            </span>
+                            <span class="agent-status text-[10px] font-mono text-gray-400">Idle</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-1">Executes cold calls, SMS follow-ups, and listing calendar booking.</p>
+                    </div>
+
+                    <!-- Agent 5 -->
+                    <div id="agent-5" class="glass-card p-3 rounded-xl border-l-4 border-l-pink-500 transition-all duration-300">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-semibold text-pink-300 flex items-center gap-1.5">
+                                <i data-lucide="repeat" class="w-3.5 h-3.5"></i> 5. Reflection & Memory Loop
+                            </span>
+                            <span class="agent-status text-[10px] font-mono text-gray-400">Idle</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-1">Learns from hang-ups/wins to adjust team objection strategies.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Real-Time Simulation, Injector, Analytics (8 Cols) -->
+        <div class="lg:col-span-8 space-y-6">
+
+            <!-- Dynamic KPI Dashboard -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                
+                <div class="glass-panel p-3.5 rounded-xl border border-gray-800 text-center relative overflow-hidden">
+                    <p class="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Total Calls</p>
+                    <p id="kpiCalls" class="text-2xl font-black text-white font-mono mt-0.5">0</p>
+                    <span class="text-[10px] text-gray-500">Dialer Volume</span>
+                </div>
+
+                <div class="glass-panel p-3.5 rounded-xl border border-gray-800 text-center relative overflow-hidden">
+                    <p class="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Connect Rate</p>
+                    <p id="kpiConnectRate" class="text-2xl font-black text-blue-400 font-mono mt-0.5">0%</p>
+                    <span class="text-[10px] text-blue-500/80">Target &gt; 18%</span>
+                </div>
+
+                <div class="glass-panel p-3.5 rounded-xl border border-gray-800 text-center relative overflow-hidden">
+                    <p class="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Appts Booked</p>
+                    <p id="kpiAppts" class="text-2xl font-black text-emerald-400 font-mono mt-0.5">0</p>
+                    <span class="text-[10px] text-emerald-500/80">Listing Leads</span>
+                </div>
+
+                <div class="glass-panel p-3.5 rounded-xl border border-gray-800 text-center relative overflow-hidden">
+                    <p class="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Objection Win %</p>
+                    <p id="kpiObjectionConv" class="text-2xl font-black text-purple-400 font-mono mt-0.5">0%</p>
+                    <span class="text-[10px] text-purple-500/80">Agility Outcome</span>
+                </div>
+
+                <div class="glass-panel p-3.5 rounded-xl border border-gray-800 text-center relative overflow-hidden">
+                    <p class="text-[10px] text-gray-400 font-medium uppercase tracking-wider">CRM Quality</p>
+                    <p id="kpiCrmQuality" class="text-2xl font-black text-cyan-400 font-mono mt-0.5">100%</p>
+                    <span class="text-[10px] text-cyan-500/80">Handoff Score</span>
+                </div>
+
+                <div class="glass-panel p-3.5 rounded-xl border border-gray-800 text-center relative overflow-hidden">
+                    <p class="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Resilience</p>
+                    <p id="kpiResilienceIndex" class="text-2xl font-black text-red-400 font-mono mt-0.5">100%</p>
+                    <span class="text-[10px] text-red-500/80">Energy Level</span>
+                </div>
+
+            </div>
+
+            <!-- Interactive Fault / Challenge Injector Section -->
+            <div class="glass-panel rounded-2xl p-5 border border-gray-800 shadow-xl">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="zap-off" class="w-5 h-5 text-amber-400"></i>
+                        <h2 class="font-bold text-base text-gray-100">Inject Real Estate Prospecting Scenarios</h2>
+                    </div>
+                    <span class="text-xs text-gray-400">Trigger live seller resistance to test setters</span>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <button onclick="injectChallenge('angry')" class="flex flex-col items-start p-3 bg-red-950/30 hover:bg-red-900/40 border border-red-800/40 hover:border-red-500/60 rounded-xl transition text-left group">
+                        <div class="flex items-center space-x-1.5 text-red-400 text-xs font-semibold mb-1 group-hover:text-red-300">
+                            <i data-lucide="flame" class="w-3.5 h-3.5"></i>
+                            <span>Angry Homeowner</span>
+                        </div>
+                        <span class="text-[11px] text-gray-400 leading-tight">Harsh hang-up & DNC threat. Tests Resilience.</span>
+                    </button>
+
+                    <button onclick="injectChallenge('fence_sitter')" class="flex flex-col items-start p-3 bg-amber-950/30 hover:bg-amber-900/40 border border-amber-800/40 hover:border-amber-500/60 rounded-xl transition text-left group">
+                        <div class="flex items-center space-x-1.5 text-amber-400 text-xs font-semibold mb-1 group-hover:text-amber-300">
+                            <i data-lucide="home" class="w-3.5 h-3.5"></i>
+                            <span>Subtle Downsizing</span>
+                        </div>
+                        <span class="text-[11px] text-gray-400 leading-tight">Fence-sitter signal. Tests Conversational Agility.</span>
+                    </button>
+
+                    <button onclick="injectChallenge('competing_agent')" class="flex flex-col items-start p-3 bg-purple-950/30 hover:bg-purple-900/40 border border-purple-800/40 hover:border-purple-500/60 rounded-xl transition text-left group">
+                        <div class="flex items-center space-x-1.5 text-purple-400 text-xs font-semibold mb-1 group-hover:text-purple-300">
+                            <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                            <span>Agent Objection</span>
+                        </div>
+                        <span class="text-[11px] text-gray-400 leading-tight">"I'm listing with cousin." Tests Assertive Empathy.</span>
+                    </button>
+
+                    <button onclick="injectChallenge('bad_data')" class="flex flex-col items-start p-3 bg-gray-800/50 hover:bg-gray-800 border border-gray-700 rounded-xl transition text-left group">
+                        <div class="flex items-center space-x-1.5 text-gray-300 text-xs font-semibold mb-1 group-hover:text-white">
+                            <i data-lucide="database-zap" class="w-3.5 h-3.5"></i>
+                            <span>Bad Lead Data</span>
+                        </div>
+                        <span class="text-[11px] text-gray-400 leading-tight">Wrong number / skip trace error. Tests Locus of Control.</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Call Flow Simulator Panel -->
+            <div class="glass-panel rounded-2xl p-5 border border-gray-800 shadow-xl space-y-4">
+                <div class="flex items-center justify-between border-b border-gray-800/80 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <div id="callPulse" class="w-3 h-3 rounded-full bg-gray-600"></div>
+                        <h2 class="font-bold text-base text-gray-100">Live Call Interaction Terminal</h2>
+                    </div>
+                    <div id="activeLeadType" class="text-xs font-mono px-2.5 py-1 rounded bg-gray-800 text-gray-300 border border-gray-700">
+                        Lead: Idle
+                    </div>
+                </div>
+
+                <!-- Simulation Dialogue Display -->
+                <div id="callLogTerminal" class="bg-[#070a0f] border border-gray-800/80 rounded-xl p-4 font-mono text-xs h-64 overflow-y-auto space-y-2.5 shadow-inner">
+                    <div class="text-gray-500 italic">Press "Start Live Simulation" or "Single Call" to begin dialing real estate prospects...</div>
+                </div>
+
+                <!-- Step-by-Step Multi-Agent Execution Bar -->
+                <div class="pt-2">
+                    <div class="text-xs text-gray-400 font-semibold mb-2 flex justify-between">
+                        <span>Agent Pipeline Step-by-Step Execution</span>
+                        <span id="pipelinePhaseText" class="text-blue-400 font-mono">Standby</span>
+                    </div>
+                    <div class="grid grid-cols-5 gap-1.5 h-2">
+                        <div id="pipe-1" class="h-full bg-gray-800 rounded transition-all duration-300"></div>
+                        <div id="pipe-2" class="h-full bg-gray-800 rounded transition-all duration-300"></div>
+                        <div id="pipe-3" class="h-full bg-gray-800 rounded transition-all duration-300"></div>
+                        <div id="pipe-4" class="h-full bg-gray-800 rounded transition-all duration-300"></div>
+                        <div id="pipe-5" class="h-full bg-gray-800 rounded transition-all duration-300"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reflection Memory & Adaptive Strategy Log -->
+            <div class="glass-panel rounded-2xl p-5 border border-gray-800 shadow-xl">
+                <div class="flex items-center justify-between mb-3 border-b border-gray-800/80 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="brain-circuit" class="w-5 h-5 text-pink-400"></i>
+                        <h2 class="font-bold text-base text-gray-100">Agent 5: Reflection & Shared Memory Store</h2>
+                    </div>
+                    <span class="text-xs text-pink-400 font-mono" id="memoryCount">0 Observations</span>
+                </div>
+
+                <div id="memoryLogList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <div class="text-xs text-gray-500 italic p-3 text-center border border-dashed border-gray-800 rounded-xl">
+                        No memory weights updated yet. Dynamic learning insights will appear here after calls.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="border-t border-gray-800 bg-[#0d131f] py-4 mt-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-gray-500">
+            ListingFlow AI • Real Estate Listing Appointment Setter Simulation Engine • Built for Real Estate Listing Operations
+        </div>
+    </footer>
+
+    <script>
+        // --- SIMULATION STATE ---
+        const state = {
+            isRunning: false,
+            timer: null,
+            callDelay: 2200,
+            
+            // Setter Traits (0-100)
+            traits: {
+                resilience: 85,
+                agility: 80,
+                empathy: 75,
+                locus: 90,
+                hygiene: 95,
+                scriptRigidity: 30, // 0 = Agility, 100 = Rigid
+                learningRate: 0.15
+            },
+
+            // KPIs
+            metrics: {
+                totalCalls: 0,
+                connectedCalls: 0,
+                apptsBooked: 0,
+                objectionsFaced: 0,
+                objectionsWon: 0,
+                crmTotalScore: 0,
+                currentResilience: 100
+            },
+
+            // Memory Store
+            memories: [],
+
+            // Pending forced scenario
+            forcedScenario: null
+        };
+
+        // Lead Categories in Real Estate Prospecting
+        const leadTypes = [
+            { type: 'Expired Listing', difficulty: 'High', priority: 'Top', context: 'Listed 6 months ago for $650k, failed to sell.' },
+            { type: 'FSBO (For Sale By Owner)', difficulty: 'High', priority: 'Top', context: 'Selling on Zillow, struggling with buyer qualification.' },
+            { type: 'Absentee Owner', difficulty: 'Medium', priority: 'Medium', context: 'Owns non-owner occupied rental with high equity.' },
+            { type: 'Circle Prospecting', difficulty: 'Low', priority: 'Normal', context: 'Neighboring property just sold above ask price.' }
+        ];
+
+        // First Names & Last Names for realistic simulation
+        const sampleNames = [
+            'Robert Miller', 'Sarah Jenkins', 'David Vance', 'Elena Rostova', 
+            'Marcus Thorne', 'Patricia Cole', 'Greg Higgins', 'Amanda Hayes'
+        ];
+
+        // --- DOM ELEMENTS ---
+        const elements = {
+            btnToggleSim: document.getElementById('btnToggleSim'),
+            btnStepSim: document.getElementById('btnStepSim'),
+            btnResetSim: document.getElementById('btnResetSim'),
+            playIcon: document.getElementById('playIcon'),
+            playText: document.getElementById('playText'),
+            simStatusBadge: document.getElementById('simStatusBadge'),
+            callLogTerminal: document.getElementById('callLogTerminal'),
+            callPulse: document.getElementById('callPulse'),
+            activeLeadType: document.getElementById('activeLeadType'),
+            pipelinePhaseText: document.getElementById('pipelinePhaseText'),
+            memoryLogList: document.getElementById('memoryLogList'),
+            memoryCount: document.getElementById('memoryCount'),
+
+            // Sliders
+            inputResilience: document.getElementById('inputResilience'),
+            inputAgility: document.getElementById('inputAgility'),
+            inputEmpathy: document.getElementById('inputEmpathy'),
+            inputLocus: document.getElementById('inputLocus'),
+            inputHygiene: document.getElementById('inputHygiene'),
+            inputScriptRigidity: document.getElementById('inputScriptRigidity'),
+            inputLearningRate: document.getElementById('inputLearningRate'),
+
+            // Slider Values
+            valResilience: document.getElementById('valResilience'),
+            valAgility: document.getElementById('valAgility'),
+            valEmpathy: document.getElementById('valEmpathy'),
+            valLocus: document.getElementById('valLocus'),
+            valHygiene: document.getElementById('valHygiene'),
+            valScriptMode: document.getElementById('valScriptMode'),
+            valLearningRate: document.getElementById('valLearningRate'),
+
+            // KPIs
+            kpiCalls: document.getElementById('kpiCalls'),
+            kpiConnectRate: document.getElementById('kpiConnectRate'),
+            kpiAppts: document.getElementById('kpiAppts'),
+            kpiObjectionConv: document.getElementById('kpiObjectionConv'),
+            kpiCrmQuality: document.getElementById('kpiCrmQuality'),
+            kpiResilienceIndex: document.getElementById('kpiResilienceIndex')
+        };
+
+        // --- EVENT LISTENERS FOR SLIDERS ---
+        function initSliderListeners() {
+            elements.inputResilience.addEventListener('input', (e) => {
+                state.traits.resilience = parseInt(e.target.value);
+                elements.valResilience.textContent = `${state.traits.resilience}%`;
+            });
+
+            elements.inputAgility.addEventListener('input', (e) => {
+                state.traits.agility = parseInt(e.target.value);
+                elements.valAgility.textContent = `${state.traits.agility}%`;
+            });
+
+            elements.inputEmpathy.addEventListener('input', (e) => {
+                state.traits.empathy = parseInt(e.target.value);
+                elements.valEmpathy.textContent = `${state.traits.empathy}%`;
+            });
+
+            elements.inputLocus.addEventListener('input', (e) => {
+                state.traits.locus = parseInt(e.target.value);
+                elements.valLocus.textContent = `${state.traits.locus}%`;
+            });
+
+            elements.inputHygiene.addEventListener('input', (e) => {
+                state.traits.hygiene = parseInt(e.target.value);
+                elements.valHygiene.textContent = `${state.traits.hygiene}%`;
+            });
+
+            elements.inputScriptRigidity.addEventListener('input', (e) => {
+                state.traits.scriptRigidity = parseInt(e.target.value);
+                const val = state.traits.scriptRigidity;
+                if (val > 70) elements.valScriptMode.textContent = "Strict Script";
+                else if (val > 35) elements.valScriptMode.textContent = "Dynamic Pivot";
+                else elements.valScriptMode.textContent = "High Agility";
+            });
+
+            elements.inputLearningRate.addEventListener('input', (e) => {
+                state.traits.learningRate = (parseInt(e.target.value) / 100).toFixed(2);
+                elements.valLearningRate.textContent = state.traits.learningRate;
+            });
+
+            elements.btnToggleSim.addEventListener('click', toggleSimulation);
+            elements.btnStepSim.addEventListener('click', runSingleCallCycle);
+            elements.btnResetSim.addEventListener('click', resetSimulation);
+        }
+
+        // --- SIMULATION ENGINE ---
+
+        function toggleSimulation() {
+            if (state.isRunning) {
+                stopSimulation();
+            } else {
+                startSimulation();
+            }
+        }
+
+        function startSimulation() {
+            state.isRunning = true;
+            elements.playIcon.setAttribute('data-lucide', 'pause');
+            lucide.createIcons();
+            elements.playText.textContent = "Pause Simulation";
+            elements.simStatusBadge.className = "flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20";
+            elements.simStatusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse mr-2"></span><span>Dialing Live...</span>`;
+
+            runSingleCallCycle();
+            state.timer = setInterval(runSingleCallCycle, state.callDelay);
+        }
+
+        function stopSimulation() {
+            state.isRunning = false;
+            clearInterval(state.timer);
+            elements.playIcon.setAttribute('data-lucide', 'play');
+            lucide.createIcons();
+            elements.playText.textContent = "Resume Simulation";
+            elements.simStatusBadge.className = "flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+            elements.simStatusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 mr-2"></span><span>Paused</span>`;
+            highlightAgent(0);
+            updatePipelineUI(0, "Standby");
+        }
+
+        function resetSimulation() {
+            stopSimulation();
+            state.metrics = {
+                totalCalls: 0,
+                connectedCalls: 0,
+                apptsBooked: 0,
+                objectionsFaced: 0,
+                objectionsWon: 0,
+                crmTotalScore: 0,
+                currentResilience: 100
+            };
+            state.memories = [];
+            state.forcedScenario = null;
+
+            elements.callLogTerminal.innerHTML = `<div class="text-gray-500 italic">Simulation reset. Ready for new dialing batch.</div>`;
+            elements.memoryLogList.innerHTML = `<div class="text-xs text-gray-500 italic p-3 text-center border border-dashed border-gray-800 rounded-xl">No memory weights updated yet. Dynamic learning insights will appear here after calls.</div>`;
+            elements.memoryCount.textContent = "0 Observations";
+            updateKPIs();
+        }
+
+        function injectChallenge(scenario) {
+            state.forcedScenario = scenario;
+            const badgeMap = {
+                angry: 'Angry Homeowner Hang-up',
+                fence_sitter: 'Fence-Sitter Downsizing',
+                competing_agent: 'Agent Cousin Objection',
+                bad_data: 'Wrong Number / Bad Data'
+            };
+            
+            appendTerminalLog("SYSTEM", `Injected manual scenario override: [${badgeMap[scenario]}] for next call.`, "text-amber-400");
+            if (!state.isRunning) {
+                runSingleCallCycle();
+            }
+        }
+
+        async function runSingleCallCycle() {
+            state.metrics.totalCalls++;
+
+            // Select Lead
+            const lead = leadTypes[Math.floor(Math.random() * leadTypes.length)];
+            const prospectName = sampleNames[Math.floor(Math.random() * sampleNames.length)];
+
+            elements.activeLeadType.textContent = `${lead.type} | ${prospectName}`;
+            elements.callPulse.className = "w-3 h-3 rounded-full bg-blue-500 animate-ping";
+
+            // STEP 1: Agent 1 - Campaign Lead Allocator
+            highlightAgent(1);
+            updatePipelineUI(1, "Agent 1: Allocating Lead");
+            appendTerminalLog("AGENT 1", `Allocated [${lead.type}] lead for ${prospectName}. Context: "${lead.context}"`, "text-blue-400");
+            await delay(300);
+
+            // STEP 2: Agent 2 - Homeowner Intent Engine
+            highlightAgent(2);
+            updatePipelineUI(2, "Agent 2: Scoring Homeowner Intent");
+            const intentScore = Math.floor(Math.random() * 40) + 50; // 50-90
+            appendTerminalLog("AGENT 2", `Intent Engine calculated propensity to sell: ${intentScore}%`, "text-amber-400");
+            await delay(300);
+
+            // Determine Outcome Scenario
+            let scenario = state.forcedScenario;
+            state.forcedScenario = null; // Clear override
+
+            if (!scenario) {
+                const roll = Math.random();
+                if (roll < 0.25) scenario = 'no_answer';
+                else if (roll < 0.40) scenario = 'angry';
+                else if (roll < 0.60) scenario = 'fence_sitter';
+                else if (roll < 0.80) scenario = 'competing_agent';
+                else if (roll < 0.90) scenario = 'bad_data';
+                else scenario = 'warm_accept';
+            }
+
+            // STEP 3 & 4: Agent 3 & 4 Execution
+            highlightAgent(4);
+            updatePipelineUI(4, "Agent 4: Multi-channel Dialing");
+
+            if (scenario === 'no_answer') {
+                appendTerminalLog("AGENT 4", `Dialing ${prospectName}... No Answer / Voicemail dropped.`, "text-gray-500");
+                updateCRMAndResilience(true, false, "No answer - Auto VM dropped");
+                highlightAgent(0);
+                updatePipelineUI(0, "Call Complete");
+                updateKPIs();
+                return;
+            }
+
+            if (scenario === 'bad_data') {
+                state.metrics.connectedCalls++;
+                appendTerminalLog("AGENT 4", `Connected to line... Prospect: "Wrong number, I don't own that house."`, "text-gray-400");
+                
+                highlightAgent(3);
+                // Internal Locus of Control handles bad data gracefully without rating drop
+                const locusPass = state.traits.locus > 60;
+                appendTerminalLog("AGENT 3/LOCUS", locusPass ? 
+                    `Locus Control: Setter flags wrong number instantly, refrains from frustration, tags CRM.` : 
+                    `Locus Control: Setter complained about lead list quality.`, 
+                    locusPass ? "text-purple-300" : "text-red-400"
+                );
+
+                updateCRMAndResilience(true, locusPass, "Bad Data / Wrong Number Tagged");
+                triggerReflection("Bad Lead Data", locusPass ? "Maintained focus despite bad data" : "Exhibited list quality frustration", locusPass);
+                updateKPIs();
+                return;
+            }
+
+            // Connected Calls
+            state.metrics.connectedCalls++;
+
+            if (scenario === 'angry') {
+                state.metrics.objectionsFaced++;
+                appendTerminalLog("PROSPECT", `"${prospectName}": "Stop calling me! All you agents are bloodsuckers! Take me off your list!"`, "text-red-400 font-bold");
+
+                highlightAgent(3);
+                updatePipelineUI(3, "Agent 3: Handling Aggressive Objection");
+
+                // Resilience & Empathy check
+                const resilienceCheck = (state.traits.resilience * 0.7 + state.traits.empathy * 0.3) > 60;
+                
+                if (resilienceCheck) {
+                    state.metrics.objectionsWon++;
+                    appendTerminalLog("SETTER (EQ)", `"I hear you completely, ${prospectName}. I know you get pounded with calls. I'm just calling because your listing expired—if you ever re-evaluate, we're here."`, "text-emerald-400");
+                    appendTerminalLog("AGENT 4", `De-escalated successfully. Soft callback scheduled for next quarter.`, "text-emerald-300");
+                } else {
+                    appendTerminalLog("SETTER", `Setter flustered by harsh hang-up. Calls ended abruptly.`, "text-red-400");
+                    // Resilience penalty
+                    state.metrics.currentResilience = Math.max(20, state.metrics.currentResilience - 15);
+                }
+
+                updateCRMAndResilience(true, resilienceCheck, "Aggressive Hang-up / DNC mitigation");
+                triggerReflection("Angry Homeowner", resilienceCheck ? "Used Assertive Empathy to neutralize anger" : "Resilience breached by harsh rejection", resilienceCheck);
+            } 
+            else if (scenario === 'fence_sitter') {
+                state.metrics.objectionsFaced++;
+                appendTerminalLog("PROSPECT", `"${prospectName}": "We're thinking of downsizing eventually, but market rates are high so we're staying put."`, "text-amber-300");
+
+                highlightAgent(3);
+                updatePipelineUI(3, "Agent 3: Conversational Agility Pivot");
+
+                // Agility & Script Rigidity check
+                const agilitySuccess = (state.traits.agility * 0.6 + (100 - state.traits.scriptRigidity) * 0.4) > 55;
+
+                if (agilitySuccess) {
+                    state.metrics.objectionsWon++;
+                    state.metrics.apptsBooked++;
+                    appendTerminalLog("SETTER (Agility)", `"Makes total sense. What if our listing agent showed you off-market equity options where your net payout offsets current rates?"`, "text-purple-300");
+                    appendTerminalLog("AGENT 4", `SUCCESS! Listing Consultation Appt Set for Thursday 2:00 PM!`, "text-emerald-400 font-bold");
+                } else {
+                    appendTerminalLog("SETTER (Rigid)", `"Okay, but our agents sell 30% faster than average! Can we come by tomorrow?" (Script overly rigid)`, "text-amber-400");
+                    appendTerminalLog("PROSPECT", `"No thanks, not ready." (Hung up)`, "text-gray-400");
+                }
+
+                updateCRMAndResilience(true, agilitySuccess, "Fence-sitter downsizing objection");
+                triggerReflection("Subtle Downsizing", agilitySuccess ? "Agility pivot converted fence-sitter to listing appointment" : "Rigid script failed to capture downsizing intent", agilitySuccess);
+            }
+            else if (scenario === 'competing_agent') {
+                state.metrics.objectionsFaced++;
+                appendTerminalLog("PROSPECT", `"${prospectName}": "My cousin is an agent, we're just going to list with her when we're ready."`, "text-purple-300");
+
+                highlightAgent(3);
+                updatePipelineUI(3, "Agent 3: Assertive Empathy Strategy");
+
+                const empathySuccess = (state.traits.empathy * 0.5 + state.traits.agility * 0.5) > 50;
+
+                if (empathySuccess) {
+                    state.metrics.objectionsWon++;
+                    state.metrics.apptsBooked++;
+                    appendTerminalLog("SETTER (Assertive EQ)", `"Family is great! But since your home failed to sell last time, wouldn't a second opinion on pricing strategy give you peace of mind?"`, "text-purple-300");
+                    appendTerminalLog("AGENT 4", `SUCCESS! 15-Min Strategy Consultation Booked!`, "text-emerald-400 font-bold");
+                } else {
+                    appendTerminalLog("SETTER", `"Well family doesn't always do the best job!" (Offensive tone)`, "text-red-400");
+                    appendTerminalLog("PROSPECT", `"Excuse me? Goodbye." (Hung up)`, "text-gray-400");
+                }
+
+                updateCRMAndResilience(true, empathySuccess, "Competitive Agent / Family Objection");
+                triggerReflection("Family Agent Objection", empathySuccess ? "Assertive empathy unlocked second-opinion listing consultation" : "Defensive pushback destroyed prospect rapport", empathySuccess);
+            }
+            else if (scenario === 'warm_accept') {
+                state.metrics.apptsBooked++;
+                appendTerminalLog("PROSPECT", `"${prospectName}": "Yes, we need to sell by summer. Have your listing agent come over."`, "text-emerald-300");
+                appendTerminalLog("AGENT 4", `SUCCESS! Direct Listing Appointment Confirmed!`, "text-emerald-400 font-bold");
+                updateCRMAndResilience(true, true, "Direct Appointment Booked");
+                triggerReflection("Direct Lead Acceptance", "Warm prospect converted with standard opening", true);
+            }
+
+            // Restore resilience slowly on successful calls
+            state.metrics.currentResilience = Math.min(100, state.metrics.currentResilience + 2);
+            elements.callPulse.className = "w-3 h-3 rounded-full bg-gray-600";
+            highlightAgent(0);
+            updatePipelineUI(0, "Call Cycle Complete");
+            updateKPIs();
+        }
+
+        // STEP 5: Agent 5 - Reflection & Memory Store Updates
+        function triggerReflection(context, takeaway, success) {
+            highlightAgent(5);
+            updatePipelineUI(5, "Agent 5: Updating Reflection & Shared Memory");
+
+            const weightChange = (state.traits.learningRate * (success ? 1 : -1)).toFixed(2);
+            const memoryItem = {
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                context: context,
+                takeaway: takeaway,
+                success: success,
+                weight: weightChange
+            };
+
+            state.memories.unshift(memoryItem);
+            if (state.memories.length > 15) state.memories.pop();
+
+            renderMemories();
+        }
+
+        function renderMemories() {
+            elements.memoryCount.textContent = `${state.memories.length} Key Reflection Memories`;
+            
+            elements.memoryLogList.innerHTML = state.memories.map(m => `
+                <div class="glass-card p-2.5 rounded-xl border-l-2 ${m.success ? 'border-l-emerald-500' : 'border-l-red-500'} text-xs flex justify-between items-start gap-2">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-bold ${m.success ? 'text-emerald-400' : 'text-red-400'}">[${m.context}]</span>
+                            <span class="text-[10px] text-gray-500 font-mono">${m.timestamp}</span>
+                        </div>
+                        <p class="text-gray-300 mt-0.5 leading-snug">${m.takeaway}</p>
+                    </div>
+                    <span class="font-mono text-[10px] px-1.5 py-0.5 rounded ${m.success ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}">
+                        ${m.weight > 0 ? '+' + m.weight : m.weight} Wt
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function updateCRMAndResilience(connected, scorePositive, note) {
+            // CRM Hygiene Calculation based on trait slider
+            const baseHygieneScore = state.traits.hygiene;
+            const score = Math.round(baseHygieneScore * (0.85 + Math.random() * 0.15));
+            state.metrics.crmTotalScore += score;
+        }
+
+        function updateKPIs() {
+            elements.kpiCalls.textContent = state.metrics.totalCalls;
+            
+            const connectRate = state.metrics.totalCalls > 0 
+                ? Math.round((state.metrics.connectedCalls / state.metrics.totalCalls) * 100) 
+                : 0;
+            elements.kpiConnectRate.textContent = `${connectRate}%`;
+
+            elements.kpiAppts.textContent = state.metrics.apptsBooked;
+
+            const objConv = state.metrics.objectionsFaced > 0 
+                ? Math.round((state.metrics.objectionsWon / state.metrics.objectionsFaced) * 100) 
+                : 0;
+            elements.kpiObjectionConv.textContent = `${objConv}%`;
+
+            const avgCrm = state.metrics.connectedCalls > 0 
+                ? Math.round(state.metrics.crmTotalScore / state.metrics.connectedCalls) 
+                : 100;
+            elements.kpiCrmQuality.textContent = `${avgCrm}%`;
+
+            elements.kpiResilienceIndex.textContent = `${Math.round(state.metrics.currentResilience)}%`;
+        }
+
+        function highlightAgent(agentNum) {
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById(`agent-${i}`);
+                const statusEl = el.querySelector('.agent-status');
+                if (i === agentNum) {
+                    el.classList.add('ring-2', 'ring-blue-500', 'bg-blue-900/30');
+                    statusEl.textContent = "Processing...";
+                    statusEl.className = "agent-status text-[10px] font-mono text-blue-400 font-bold animate-pulse";
+                } else {
+                    el.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-900/30');
+                    statusEl.textContent = "Active";
+                    statusEl.className = "agent-status text-[10px] font-mono text-gray-500";
+                }
+            }
+        }
+
+        function updatePipelineUI(activeStep, text) {
+            elements.pipelinePhaseText.textContent = text;
+            for (let i = 1; i <= 5; i++) {
+                const pipe = document.getElementById(`pipe-${i}`);
+                if (i <= activeStep) {
+                    pipe.className = "h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded transition-all duration-300 shadow-sm shadow-blue-500/50";
+                } else {
+                    pipe.className = "h-full bg-gray-800 rounded transition-all duration-300";
+                }
+            }
+        }
+
+        function appendTerminalLog(sender, message, colorClass) {
+            const entry = document.createElement('div');
+            entry.className = "flex items-start space-x-2";
+            entry.innerHTML = `
+                <span class="text-gray-500 font-mono text-[10px]">[${new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}]</span>
+                <span class="font-bold ${colorClass} min-w-[75px]">${sender}:</span>
+                <span class="text-gray-200 flex-1">${message}</span>
+            `;
+            elements.callLogTerminal.appendChild(entry);
+            elements.callLogTerminal.scrollTop = elements.callLogTerminal.scrollHeight;
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Initialize application on load
+        window.onload = function() {
+            lucide.createIcons();
+            initSliderListeners();
+            updateKPIs();
+        };
+    </script>
+</body>
+</html>
